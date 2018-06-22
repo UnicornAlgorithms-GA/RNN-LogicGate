@@ -10,7 +10,7 @@
   * 2 - hidden neuron
   * O3 - output
 
-The recurrent connections in this project are explicitly separated in a different neuron. In the network above, the *yellow* neuron was added for the connection: **2 -> 2**. Before each neural computation, the *memory neurons* get the value of their targets neurons. In this case, the **4th** neuron (yellow), receives the value of the **2nd** neuron.
+In this project, the recurrent connections are explicitly separated in a different neuron. In the network above, the *yellow* neuron was added for the connection: **2 -> 2**. Before each neural computation, the *memory neurons* get the value of their targets neurons. In this case, the **4th** neuron (yellow), receives the value of the **2nd** neuron.
 
 The hidden neuron (2) has a *Gaussian* activation function.
 
