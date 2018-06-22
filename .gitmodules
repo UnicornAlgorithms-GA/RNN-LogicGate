@@ -1,0 +1,6 @@
+[submodule "Submodules/GeneticLib"]
+	path = Submodules/GeneticLib
+	url = https://github.com/TermanEmil/GeneticLib.git
+[submodule "Submodules/MachineLearningPyGraphUtils"]
+	path = Submodules/MachineLearningPyGraphUtils
+	url = https://github.com/TermanEmil/MachineLearningPyGraphUtils.git
