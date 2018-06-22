@@ -20,6 +20,6 @@ The hidden neuron (2) has a *Gaussian* activation function.
 
 This project was inspired from the [OpenAI Warmups exercises](https://blog.openai.com/requests-for-research-2/).
 
-The agents are trained as the link suggests, only it uses only 100 instead of 100000 datasets.
+The agents are trained as the link suggests, the only difference it's that it uses only 100 instead of 100000 datasets.
 
 ![](./aux/fitness-calculation.png)
