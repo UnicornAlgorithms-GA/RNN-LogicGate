@@ -22,6 +22,7 @@ using GeneticLib.Neurology;
 using GeneticLib.Neurology.NeuralModels;
 using GeneticLib.Neurology.Neurons;
 using GeneticLib.Neurology.NeuronValueModifiers;
+using GeneticLib.Neurology.PredefinedStructures.LSTMs;
 using GeneticLib.Randomness;
 using GeneticLib.Utils.Graph;
 using GeneticLib.Utils.NeuralUtils;
@@ -115,8 +116,8 @@ namespace RNN_LogicGate
         
         public Program()
         {
-			datasets = GenerateDatasets(100, GARandomManager.Random.Next(1, 50)).ToArray();
-			//datasets = GenerateDatasets(100, 50).ToArray();
+			datasets = GenerateDatasets(25, GARandomManager.Random.Next(1, 20)).ToArray();
+			//datasets = GenerateDatasets(50, 10).ToArray();
 
             var synapseTracker = new SynapseInnovNbTracker();
 
@@ -180,6 +181,7 @@ namespace RNN_LogicGate
             genome.NetworkOperationBaker.BakeNetwork(genome);
             var fitness = 0d;
             
+            // Continuous input.
 			foreach (var dataset in datasets)
 			{
 				genome.ResetNeuronsValues();
@@ -195,7 +197,17 @@ namespace RNN_LogicGate
 				}            
 			}
 
-            if (fitness >= -0.01f)
+            // Pair input
+			//foreach (var pair in samplePairs)
+			//{
+			//	var output = FeedRNNPair(genome, pair);
+			//	var expectedResult = pair[0] ^ pair[1];
+
+			//	var delta = Math.Abs(expectedResult - output);
+   //             fitness -= delta;
+			//}
+
+            if (fitness >= -1f)
                 targetReached = true;
 
             return (float)fitness;
@@ -223,7 +235,7 @@ namespace RNN_LogicGate
         {
             var model = new NeuralModelBase();
             model.defaultWeightInitializer = () => GARandomManager.NextFloat(-3, 3);
-            model.WeightConstraints = new Tuple<float, float>(-20, 20);
+            model.WeightConstraints = new Tuple<float, float>(-10, 10);
 
             var bias = model.AddBiasNeuron();
             var layers = new[]
@@ -241,14 +253,20 @@ namespace RNN_LogicGate
             model.ConnectBias(bias, layers.Skip(1));
             model.ConnectLayers(layers);
 
-			foreach (var neuron in layers[1])
-			{
-				var mem = model.AddNeurons(
-				    sampleNeuron: new MemoryNeuron(-1, neuron.InnovationNb),
-					count: 1);
-				model.AddConnection(mem[0].InnovationNb, neuron.InnovationNb);
-			}
-            
+			// Adding RNN
+			//foreach (var neuron in layers[1])
+			//{
+			//	var mem = model.AddNeurons(
+			//	    sampleNeuron: new MemoryNeuron(-1, neuron.InnovationNb),
+			//		count: 1);
+			//	model.AddConnection(mem[0].InnovationNb, neuron.InnovationNb);
+			//}
+
+			// Addin LSTM
+			var input = layers.First().First();
+			var output = layers[1].First();
+			var lstm = model.AddLSTM(input, biasNeuron: bias);
+			model.AddConnection(lstm, output);
             return model;
         }
 
