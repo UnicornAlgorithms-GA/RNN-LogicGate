@@ -116,7 +116,7 @@ namespace RNN_LogicGate
         
         public Program()
         {
-			datasets = GenerateDatasets(25, GARandomManager.Random.Next(1, 20)).ToArray();
+			datasets = GenerateDatasets(25, () => GARandomManager.Random.Next(1, 20)).ToArray();
 			//datasets = GenerateDatasets(50, 10).ToArray();
 
             var synapseTracker = new SynapseInnovNbTracker();
@@ -221,11 +221,13 @@ namespace RNN_LogicGate
 			return genome.Outputs.First().Value;
 		}
 
-		private IEnumerable<int[]> GenerateDatasets(int size, int binaryStrLen)
+		private IEnumerable<int[]> GenerateDatasets(
+			int size,
+			Func<int> binaryStrLen)
 		{
 			for (int i = 0; i < size; i++)
 			{
-				yield return Enumerable.Range(0, binaryStrLen)
+				yield return Enumerable.Range(0, binaryStrLen())
 									   .Select(x => GARandomManager.Random.Next(0, 2))
 									   .ToArray();
 			}
@@ -234,8 +236,8 @@ namespace RNN_LogicGate
         private INeuralModel InitModel()
         {
             var model = new NeuralModelBase();
-            model.defaultWeightInitializer = () => GARandomManager.NextFloat(-3, 3);
-            model.WeightConstraints = new Tuple<float, float>(-10, 10);
+            model.defaultWeightInitializer = () => GARandomManager.NextFloat(-1, 1);
+            model.WeightConstraints = new Tuple<float, float>(-5, 5);
 
             var bias = model.AddBiasNeuron();
             var layers = new[]
@@ -265,8 +267,15 @@ namespace RNN_LogicGate
 			// Addin LSTM
 			var input = layers.First().First();
 			var output = layers[1].First();
-			var lstm = model.AddLSTM(input, biasNeuron: bias);
-			model.AddConnection(lstm, output);
+
+			var a = new[] { 1, 2, 3 };
+			a.Where(x => x == 0)
+			 .GroupBy(x => x)
+			 .ToArray();
+
+			model.AddLSTM(out var lstmIn, out var lstmOut, biasNeuron: bias);
+			model.AddConnection(input, lstmIn);
+			model.AddConnection(lstmOut, output);
             return model;
         }
 
